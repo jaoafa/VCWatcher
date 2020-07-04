@@ -3,7 +3,6 @@ package com.jaoafa.VCWatcher.Event;
 import com.jaoafa.VCWatcher.Main;
 import com.jaoafa.VCWatcher.Lib.VCData;
 
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
@@ -13,7 +12,6 @@ public class Event_VCJoin {
 	@SubscribeEvent
 	public void onVCJoin(GuildVoiceJoinEvent event) {
 		System.out.println("onVCJoin()");
-		JDA jda = event.getJDA();
 		Guild guild = event.getGuild();
 		String vcName = event.getChannelJoined().getName();
 		long vcid = event.getChannelJoined().getIdLong();
