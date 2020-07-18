@@ -22,6 +22,10 @@ public class Event_VCMove {
 			return;
 		}
 
+		if (guild.getAfkChannel().getIdLong() == vcid) {
+			return;
+		}
+
 		long channelid = Main.alertChannel(guild);
 		TextChannel channel = Main.getJDA().getTextChannelById(channelid);
 		if (channel == null) {
@@ -37,6 +41,28 @@ public class Event_VCMove {
 		} else {
 			Main.setVCData(new VCData(guild.getIdLong(), vcid, userid));
 		}
-		channel.sendMessage(":telephone_receiver:" + vcName + "で" + userstr + "が通話をはじめました。").queue();
+
+		long count = Main.getVCMembersCountIgnoreBot(event.getChannelJoined());
+		if (count != 1) {
+			return;
+		}
+
+		long lastmessageId = Main.getLastMessageId(guild);
+		if (lastmessageId != -1) {
+			channel.retrieveMessageById(lastmessageId).queue(
+					msg -> {
+						if (msg == null) {
+							return;
+						}
+						msg.delete().queue();
+					});
+		}
+
+		channel.sendMessage(":telephone_receiver:" + vcName + "で" + userstr + "が通話をはじめました。").queue(
+				msg -> {
+					if (!Main.setLastMessageId(msg.getGuild(), msg.getIdLong())) {
+						System.out.println("setLastMessageId: failed.");
+					}
+				});
 	}
 }
