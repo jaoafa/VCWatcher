@@ -28,7 +28,7 @@ public class Event_VCJoin {
 			return;
 		}
 
-		if (guild.getAfkChannel().getIdLong() == vcid) {
+		if (guild.getAfkChannel() != null && guild.getAfkChannel().getIdLong() == vcid) {
 			return;
 		}
 
@@ -49,20 +49,33 @@ public class Event_VCJoin {
 
 		long lastmessageId = Main.getLastMessageId(guild);
 		if (lastmessageId != -1) {
-			channel.retrieveMessageById(lastmessageId).queue(
-					msg -> {
-						if (msg == null) {
-							return;
-						}
-						msg.delete().queue();
-					});
+			long nowLastMsgID = channel.getLatestMessageIdLong();
+			if(nowLastMsgID != lastmessageId){
+				channel.retrieveMessageById(lastmessageId).queue(
+						msg -> {
+							if (msg == null) {
+								return;
+							}
+							msg.delete().queue();
+						});
+				lastmessageId = -1;
+			}
 		}
 
-		channel.sendMessage(":telephone_receiver:" + vcName + "で" + userstr + "が通話をはじめました。").queue(
-				msg -> {
-					if (!Main.setLastMessageId(msg.getGuild(), msg.getIdLong())) {
-						System.out.println("setLastMessageId: failed.");
-					}
-				});
+		if (lastmessageId != -1) {
+			channel.sendMessage(":telephone_receiver:" + vcName + "で" + userstr + "が通話をはじめました。").queue(
+					msg -> {
+						if (!Main.setLastMessageId(msg.getGuild(), msg.getIdLong())) {
+							System.out.println("setLastMessageId: failed.");
+						}
+					});
+		}else{
+			channel.retrieveMessageById(lastmessageId).queue(msg -> msg.editMessage(":telephone_receiver:" + vcName + "で" + userstr + "が通話をはじめました。").queue(
+					_msg -> {
+						if (!Main.setLastMessageId(_msg.getGuild(), _msg.getIdLong())) {
+							System.out.println("setLastMessageId: failed.");
+						}
+					}));
+		}
 	}
 }
