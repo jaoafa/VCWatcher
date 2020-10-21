@@ -55,6 +55,7 @@ public class Event_VCJoin {
                             if (msg == null) {
                                 return;
                             }
+                            System.out.println("msg.delete");
                             msg.delete().queue();
                         });
                 lastmessageId = -1;
@@ -62,6 +63,7 @@ public class Event_VCJoin {
         }
 
         if (lastmessageId != -1) {
+            System.out.printf("channel.sendMessage() %s %s%n", vcName, userstr);
             channel.sendMessage(":telephone_receiver:" + vcName + "で" + userstr + "が通話をはじめました。").queue(
                     msg -> {
                         if (!Main.setLastMessageId(msg.getGuild(), msg.getIdLong())) {
@@ -69,18 +71,22 @@ public class Event_VCJoin {
                         }
                     });
         } else {
+            System.out.println("msg.editMessage");
             channel.retrieveMessageById(lastmessageId).queue(msg -> msg.editMessage(":telephone_receiver:" + vcName + "で" + userstr + "が通話をはじめました。").queue(
                     _msg -> {
                         if (!Main.setLastMessageId(_msg.getGuild(), _msg.getIdLong())) {
                             System.out.println("setLastMessageId: failed.");
                         }
                     }),
-                    failure -> channel.sendMessage(":telephone_receiver:" + vcName + "で" + userstr + "が通話をはじめました。").queue(
-                            msg -> {
-                                if (!Main.setLastMessageId(msg.getGuild(), msg.getIdLong())) {
-                                    System.out.println("setLastMessageId: failed.");
-                                }
-                            }));
+                    failure -> {
+                        System.out.println("channel.sendMessage");
+                        channel.sendMessage(":telephone_receiver:" + vcName + "で" + userstr + "が通話をはじめました。").queue(
+                                msg -> {
+                                    if (!Main.setLastMessageId(msg.getGuild(), msg.getIdLong())) {
+                                        System.out.println("setLastMessageId: failed.");
+                                    }
+                                });
+                    });
         }
     }
 }
