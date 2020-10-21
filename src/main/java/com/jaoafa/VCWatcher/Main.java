@@ -173,16 +173,23 @@ public class Main {
     }
 
     public static boolean setLastMessageId(Guild guild, long messageid) {
+        Path path = Paths.get("lastmessage.json");
         try {
-            Path path = Paths.get("lastmessage.json");
             String data = String.join("\n", Files.readAllLines(path));
             JSONObject json = new JSONObject(data);
             json.put(guild.getId(), messageid);
             Files.write(path, json.toString().getBytes(), StandardOpenOption.WRITE);
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+            try {
+                JSONObject json = new JSONObject();
+                json.put(guild.getId(), messageid);
+                Files.write(path, json.toString().getBytes(), StandardOpenOption.WRITE);
+                return true;
+            } catch (IOException ex) {
+                ex.printStackTrace();
+                return false;
+            }
         }
     }
 

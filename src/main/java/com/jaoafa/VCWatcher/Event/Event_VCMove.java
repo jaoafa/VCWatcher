@@ -21,13 +21,13 @@ public class Event_VCMove {
             return;
         }
 
-        if (guild.getAfkChannel() != null && guild.getAfkChannel().getIdLong() == vcid) {
-            return;
-        }
-
         long channelid = Main.alertChannel(guild);
         TextChannel channel = Main.getJDA().getTextChannelById(channelid);
         if (channel == null) {
+            return;
+        }
+
+        if (guild.getAfkChannel() != null && guild.getAfkChannel().getIdLong() == vcid) {
             return;
         }
 
