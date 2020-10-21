@@ -47,7 +47,7 @@ public class Event_VCJoin {
         }
 
         long lastmessageId = Main.getLastMessageId(guild);
-        if (lastmessageId != -1) {
+        if (lastmessageId != -1 && channel.hasLatestMessage()) {
             long nowLastMsgID = channel.getLatestMessageIdLong();
             if (nowLastMsgID != lastmessageId) {
                 channel.retrieveMessageById(lastmessageId).queue(
@@ -74,7 +74,13 @@ public class Event_VCJoin {
                         if (!Main.setLastMessageId(_msg.getGuild(), _msg.getIdLong())) {
                             System.out.println("setLastMessageId: failed.");
                         }
-                    }));
+                    }),
+                    failure -> channel.sendMessage(":telephone_receiver:" + vcName + "で" + userstr + "が通話をはじめました。").queue(
+                            msg -> {
+                                if (!Main.setLastMessageId(msg.getGuild(), msg.getIdLong())) {
+                                    System.out.println("setLastMessageId: failed.");
+                                }
+                            }));
         }
     }
 }
